@@ -7,11 +7,11 @@ let midiChannel: UInt8 = 0
 let config = MidiConfig(IACPort: IACPort, midiChannel: midiChannel)
 //
 
-func sendCC(controlNumber: UInt8, controlValue: UInt8) {
+func sendCC(channel: UInt8, controlNumber: UInt8, controlValue: UInt8) {
     var packet = MIDIPacket()
     packet.timeStamp = 0
     packet.length = 3
-    packet.data.0 = 0xB0 | config.midiChannel  // Control Change command with channel
+    packet.data.0 = 0xB0 | channel - 1  // Control Change command with channel
     packet.data.1 = controlNumber
     packet.data.2 = controlValue
 
@@ -20,13 +20,13 @@ func sendCC(controlNumber: UInt8, controlValue: UInt8) {
     MIDISend(config.outputPort, config.IACDestination, &packetList)
 }
 
-func sendNote(note: UInt8, velocity: UInt8, noteOff: Bool) {
+func sendNote(channel: UInt8, note: UInt8, velocity: UInt8, noteOff: Bool) {
     let commandByte: UInt8 = noteOff ? 0x80 : 0x90
     let commandEnglish: String = noteOff ? "NoteOff" : "NoteOn"
     var packet: MIDIPacket = MIDIPacket()
     packet.timeStamp = 0
     packet.length = 3
-    packet.data.0 = commandByte | config.midiChannel // Note-on/off command with channel
+    packet.data.0 = commandByte | channel - 1 // Note-on/off command with channel
     packet.data.1 = note
     packet.data.2 = velocity
 

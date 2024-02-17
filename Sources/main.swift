@@ -9,16 +9,16 @@ enum MIDICommand: String {
     case sysex
 }
 
-func sendMIDI(command: MIDICommand, data1: UInt8, data2: UInt8) {
+func sendMIDI(channel: UInt8, command: MIDICommand, data1: UInt8, data2: UInt8) {
     switch command {
         case MIDICommand.cc:
-            sendCC(controlNumber: data1, controlValue: data2)
+            sendCC(channel: channel, controlNumber: data1, controlValue: data2)
             break
         case MIDICommand.on:
-            sendNote(note: data1, velocity: data2, noteOff: false)
+            sendNote(channel: channel, note: data1, velocity: data2, noteOff: false)
             break
         case MIDICommand.off:
-            sendNote(note: data1, velocity: data2, noteOff: true)
+            sendNote(channel: channel, note: data1, velocity: data2, noteOff: true)
             break
         case MIDICommand.sysex:
             sendSysex()
@@ -27,12 +27,12 @@ func sendMIDI(command: MIDICommand, data1: UInt8, data2: UInt8) {
 }
 
 func printUsage() {
-    print("Usage: smidi <data1> <data2> <command>")
+    print("Usage: smidi <channel> <data1> <data2> <command>")
     print("Commands:")
-    print("  <cc_command> <value> cc")
-    print("  <note_number> <velocity> on")
-    print("  <note_number> <velocity> off")
-    print("  <sysex not yet implemented> sysex")
+    print("  <channel> <cc_command> <value> cc")
+    print("  <channel> <note_number> <velocity> on")
+    print("  <channel> <note_number> <velocity> off")
+    //print("  <sysex not yet implemented>")
 }
 
 // --------------------------------------------------------
@@ -41,21 +41,21 @@ func printUsage() {
 
 let args = CommandLine.arguments
 
-guard args.count == 4 else {
+guard args.count == 5 else {
     printUsage()
     exit(1)
 }
 
-guard let command = MIDICommand(rawValue: args[3]) else {
+guard let command = MIDICommand(rawValue: args[4]) else {
     print("Invalid command.")
     printUsage()
     exit(1)
 }
 
-guard let data1: UInt8 = UInt8(args[1]), let data2: UInt8 = UInt8(args[2]) else {
+guard let channel: UInt8 = UInt8(args[1]), let data1: UInt8 = UInt8(args[2]), let data2: UInt8 = UInt8(args[3]) else {
     print("Invalid data format.")
     printUsage()
     exit(1)
 }
 
-sendMIDI(command: command, data1: data1, data2: data2)
+sendMIDI(channel: channel, command: command, data1: data1, data2: data2)
